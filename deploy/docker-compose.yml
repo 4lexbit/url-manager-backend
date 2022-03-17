@@ -1,0 +1,68 @@
+version: '3.7'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./deploy/Dockerfile
+    image: urlman:${URLMAN_VERSION:-latest}
+    restart: always
+    env_file:
+    - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      URLMAN_HOST: 0.0.0.0
+      URLMAN_DB_HOST: urlman-db
+      URLMAN_DB_PORT: 5432
+      URLMAN_DB_USER: urlman
+      URLMAN_DB_PASS: urlman
+      URLMAN_DB_BASE: urlman
+    ports:
+    - '0.0.0.0:8000:8000'
+  db:
+    image: postgres:13.4-buster
+    hostname: urlman-db
+    environment:
+      POSTGRES_PASSWORD: "urlman"
+      POSTGRES_USER: "urlman"
+      POSTGRES_DB: "urlman"
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+    - "5432:5432"
+    volumes:
+    - urlman-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test:
+      - CMD
+      - pg_isready
+      - -U
+      - urlman
+      interval: 2s
+      timeout: 3s
+      retries: 40
+
+
+
+  migrator:
+    image: urlman:${URLMAN_VERSION:-latest}
+    restart: "no"
+    command: alembic upgrade head
+    environment:
+      URLMAN_DB_HOST: urlman-db
+      URLMAN_DB_PORT: 5432
+      URLMAN_DB_USER: urlman
+      URLMAN_DB_PASS: urlman
+      URLMAN_DB_BASE: urlman
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+
+
+volumes:
+  urlman-db-data:
+    name: urlman-db-data
