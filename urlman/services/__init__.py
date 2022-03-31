@@ -1,1 +1,1 @@
-"""Services for urlman."""
+GEN_DELIMS = "$-_.+!*'(),"

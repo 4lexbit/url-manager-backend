@@ -6,41 +6,42 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from urlman.db.models.user import UserModel
 from urlman.services.hashing import hash_password
+from urlman.web.api.users.exceptions import UserNotFoundException
 from urlman.web.api.users.repos.selectors import get_user_by_id
 from urlman.web.api.users.schemas import UserIn, UserUpdate
 
 
-async def register_user(
-    session: AsyncSession,
-    user: UserIn,
-) -> UserModel:
+async def register_user(*, user: UserIn, session: AsyncSession) -> UserModel:
     """Create new user."""
     hashed_password = hash_password(user.password)
     user = UserModel(
         username=user.username,
+        email=user.email,
         password=hashed_password,
         first_name=user.first_name,
         last_name=user.last_name,
     )
     session.add(user)
     await session.commit()
+    await session.refresh(user)
     return user
 
 
 async def update_user(
-    session: AsyncSession,
-    data: UserUpdate,
+    *,
     user_id: str,
+    data: UserUpdate,
+    session: AsyncSession,
 ) -> Optional[UserModel]:
     """Update user."""
     user = await get_user_by_id(
         session=session,
         user_id=user_id,
     )
-    updated_data = data.dict(exclude_none=True, exclude_unset=True)
     if user is None:
-        return None
+        raise UserNotFoundException()
 
+    updated_data = data.dict(exclude_none=True, exclude_unset=True)
     hashed_password = hash_password(updated_data.get("password"))
     updated_data["password"] = hashed_password
 
@@ -57,34 +58,36 @@ async def update_user(
     return user
 
 
-async def change_password(
+async def soft_delete_user(
+    *,
+    user_id: str,
     session: AsyncSession,
-    user: UserModel,
 ) -> Optional[UserModel]:
-    """Change user password."""
-
-
-async def soft_delete_user(session: AsyncSession, user_id: str) -> UserModel:
     """Change is_deleted to True."""
     user = await get_user_by_id(
         session=session,
         user_id=user_id,
     )
     if user is None:
-        return None
-    user.is_deleted = False
+        raise UserNotFoundException()
+
+    user.is_deleted = True
     user.deleted_at = func.now()
     await session.commit()
     return user
 
 
 async def delete_user(
-    session: AsyncSession,
+    *,
     user_id: str,
-) -> Optional[UserModel]:
+    session: AsyncSession,
+) -> None:
     """Delete user from db."""
-    user = get_user_by_id(session, user_id)
+    user = await get_user_by_id(
+        session=session,
+        user_id=user_id,
+    )
     if user is None:
-        return None
+        raise UserNotFoundException()
     await session.delete(user)
     await session.commit()

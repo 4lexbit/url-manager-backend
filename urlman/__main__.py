@@ -12,6 +12,8 @@ def main() -> None:
         port=settings.port,
         reload=settings.reload,
         factory=True,
+        proxy_headers=True,
+        forwarded_allow_ips="*",
     )
 
 

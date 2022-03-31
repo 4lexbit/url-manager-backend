@@ -1,6 +1,7 @@
 from pathlib import Path
 from tempfile import gettempdir
 
+from fastapi.security import HTTPBearer
 from pydantic import BaseSettings
 from yarl import URL
 
@@ -23,8 +24,11 @@ class Settings(BaseSettings):
     db_base: str = "urlman"
     db_echo: bool = False
     hash_salt: str = "salt1337"
-    jwt_issuer: str = "urlman"
+    jwt_alg: str = "HS256"
+    jwt_iss: str = "urlman"
     jwt_secret: str = "secret"
+    jwt_expires: int = 7 * 24 * 60
+    auth_scheme = HTTPBearer(auto_error=False)
 
     @property
     def db_url(self) -> URL:

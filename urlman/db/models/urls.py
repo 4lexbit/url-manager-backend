@@ -35,9 +35,9 @@ class UrlModel(UUIDMixin, TimeStampMixin, SoftDeleteMixin, Base):
     )
     user = relationship(
         "UserModel",
-        back_populates="url",
+        back_populates="urls",
     )
-    transition = relationship(
+    transitions = relationship(
         "TransitionModel",
         back_populates="url",
     )

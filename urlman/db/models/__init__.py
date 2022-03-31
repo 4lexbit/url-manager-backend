@@ -1,6 +1,7 @@
 import pkgutil
 from pathlib import Path
 
+from urlman.db.models.transition import TransitionModel
 from urlman.db.models.urls import UrlModel
 from urlman.db.models.user import UserModel
 
@@ -19,5 +20,6 @@ def load_all_models() -> None:
 __all__ = [
     "UrlModel",
     "UserModel",
+    "TransitionModel",
     "load_all_models",
 ]

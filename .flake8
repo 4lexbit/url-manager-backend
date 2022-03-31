@@ -17,6 +17,11 @@ ignore =
   WPS421,
   WPS410,
   WPS215,
+  S311,
+  WPS111,
+  WPS608,
+  N805,
+  WPS337,
   ; Missing docstring in public package
   D104,
   ; Found empty module

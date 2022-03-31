@@ -37,4 +37,4 @@ class UserModel(UUIDMixin, TimeStampMixin, SoftDeleteMixin, Base):
         nullable=True,
     )
 
-    url = relationship("UrlModel", back_populates="user")
+    urls = relationship("UrlModel", back_populates="user")

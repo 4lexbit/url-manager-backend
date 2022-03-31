@@ -29,5 +29,5 @@ class TransitionModel(Base):
     )
     url = relationship(
         "UrlModel",
-        back_populates="transition",
+        back_populates="transitions",
     )
