@@ -58,3 +58,5 @@ jobs:
       env:
         URLMAN_DB_HOST: localhost
         URLMAN_DB_PORT: ${{job.services.urlman-db.ports['5432']}}
+    - name: Upload coverege to Codecov
+      uses: codecov/codecov-action@v2
