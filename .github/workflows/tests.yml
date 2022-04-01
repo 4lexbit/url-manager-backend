@@ -54,7 +54,7 @@ jobs:
       env:
         POETRY_VIRTUALENVS_CREATE: false
     - name: Run pytest check
-      run: poetry run pytest -vv --cov="urlman" . --cov-report xml .
+      run: poetry run pytest -vv --cov="urlman" . --cov-report=xml
       env:
         URLMAN_DB_HOST: localhost
         URLMAN_DB_PORT: ${{job.services.urlman-db.ports['5432']}}

@@ -1,7 +1,7 @@
 # urlman
 
 ![GitHub](https://img.shields.io/github/license/4lexbit/url-manager-backend?style=for-the-badge)
-
+[![codecov](https://codecov.io/gh/4lexbit/url-manager-backend/branch/main/graph/badge.svg?token=4N5HDVILC8)](https://codecov.io/gh/4lexbit/url-manager-backend)
 ### Simple service for managing urls: link shortening, viewing visits with ip definition
 
 <hr>
