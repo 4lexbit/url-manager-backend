@@ -30,3 +30,13 @@ class UserCredentialsException(HTTPException):
             detail="Could not validate credentials.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+class UserPasswordMismatchException(HTTPException):
+    """Raised when password don't match."""
+
+    def __init__(self) -> None:
+        super(UserPasswordMismatchException, self).__init__(
+            status_code=400,
+            detail="Passwords don't match",
+        )

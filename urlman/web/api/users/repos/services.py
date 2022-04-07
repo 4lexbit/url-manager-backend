@@ -5,10 +5,13 @@ from sqlalchemy import func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from urlman.db.models.user import UserModel
-from urlman.services.hashing import hash_password
-from urlman.web.api.users.exceptions import UserNotFoundException
+from urlman.services.hashing import hash_password, verify_password
+from urlman.web.api.users.exceptions import (
+    UserNotFoundException,
+    UserPasswordMismatchException,
+)
 from urlman.web.api.users.repos.selectors import get_user_by_id
-from urlman.web.api.users.schemas import UserIn, UserUpdate
+from urlman.web.api.users.schemas import UserChangePassword, UserIn, UserUpdate
 
 
 async def register_user(*, user: UserIn, session: AsyncSession) -> UserModel:
@@ -91,3 +94,21 @@ async def delete_user(
         raise UserNotFoundException()
     await session.delete(user)
     await session.commit()
+
+
+async def change_user_password(
+    *,
+    user: UserModel,
+    creds: UserChangePassword,
+    session: AsyncSession,
+) -> None:
+    """Change user password."""
+    creds_data = creds.dict(exclude_none=True, exclude_unset=True)
+    if verify_password(
+        db_password=user.password,
+        verifiable_password=creds_data.pop("password"),
+    ):
+        user.password = hash_password(creds_data.pop("new_password"))
+        await session.commit()
+    else:
+        raise UserPasswordMismatchException()
